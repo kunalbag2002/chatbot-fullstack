@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #333333;
+  --panel: #333333;
+  --muted: #94a3b8;
+  --accent: #6b6b6b;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: linear-gradient(180deg, #0b0b0b 0%, #1E1E1E 100%);
+}
+
+/* small helper for custom scrollbar */
+.scrollbar-thin::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(28, 28, 28, 0.08);
+  border-radius: 8px;
+}
