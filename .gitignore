@@ -20,3 +20,7 @@ chatBot-frontend/dist
 # IDE
 .vscode/
 .idea/
+
+.env
+*.env
+chatBot-backend/.env
