@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+.env
+venv/
+
+# Node
+node_modules/
+dist/
+.env.local
+
+# System
+.DS_Store
+Thumbs.db
+
+# Vite
+chatBot-frontend/node_modules
+chatBot-frontend/dist
+
+# IDE
+.vscode/
+.idea/
