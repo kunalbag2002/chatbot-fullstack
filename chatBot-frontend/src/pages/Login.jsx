@@ -1,12 +1,15 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState("");
+    const navigate = useNavigate();
 
-    async function handleLogin(e) {
+    const handleLogin = async (e) => {
         e.preventDefault();
+        setError("");
 
         try {
             const res = await fetch("https://chatbot-fullstack-j8hr.onrender.com/login", {
@@ -15,73 +18,67 @@ export default function Login() {
                 body: JSON.stringify({ email, password }),
             });
 
-            const data = await res.json();
+            if (res.ok) {
+                const data = await res.json();
+                console.log("✅ Login success:", data);
 
-            if (data.error) {
-                alert(data.error);
+                // Store user info in localStorage (since no JWT)
+                localStorage.setItem("user", JSON.stringify(data));
+
+                // Redirect to /chat
+                navigate("/chat");
             } else {
-                alert("✅ Login successful!");
-                localStorage.setItem("user", JSON.stringify(data.user));
-                window.location.href = "/chat";
+                const err = await res.json();
+                setError(err.detail || "Invalid credentials");
             }
         } catch (err) {
-            alert("⚠️ Could not connect to the server.");
             console.error(err);
+            setError("Something went wrong. Try again.");
         }
-    }
+    };
 
     return (
         <div className="h-screen flex items-center justify-center bg-[#1E1E1E] text-white">
-            <div className="w-[380px] bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-8">
-                <h1 className="text-2xl font-semibold mb-6">Welcome Back</h1>
+            <form
+                onSubmit={handleLogin}
+                className="bg-[#2A2A2A] p-8 rounded-2xl shadow-lg w-96"
+            >
+                <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
-                <form onSubmit={handleLogin} className="space-y-4">
-                    <div>
-                        <label className="text-sm">Email</label>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            className="w-full mt-1 p-2 rounded-md bg-[#2A2A2A] border border-zinc-600 outline-none"
-                        />
-                    </div>
+                <input
+                    type="email"
+                    placeholder="Email"
+                    className="w-full mb-4 p-3 rounded-lg bg-[#1E1E1E] text-white outline-none border border-zinc-600"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
 
-                    <div>
-                        <label className="text-sm">Password</label>
-                        <div className="relative">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                className="w-full mt-1 p-2 rounded-md bg-[#2A2A2A] border border-zinc-600 outline-none pr-10"
-                            />
-                            <button
-                                type="button"
-                                className="absolute right-3 top-3 text-sm text-white/60"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? "Hide" : "Show"}
-                            </button>
-                        </div>
-                    </div>
+                <input
+                    type="password"
+                    placeholder="Password"
+                    className="w-full mb-4 p-3 rounded-lg bg-[#1E1E1E] text-white outline-none border border-zinc-600"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
 
-                    <button
-                        type="submit"
-                        className="w-full bg-[#19C37D] text-black font-medium py-2 rounded-md"
-                    >
-                        Login
-                    </button>
-                </form>
+                {error && <p className="text-red-400 text-sm mb-3">{error}</p>}
 
-                <div className="mt-4 text-center text-sm">
+                <button
+                    type="submit"
+                    className="w-full bg-[#EF4444] py-3 rounded-lg text-white font-semibold hover:bg-[#dc2626] transition"
+                >
+                    Login
+                </button>
+
+                <p className="text-sm text-center mt-4 text-gray-400">
                     Don’t have an account?{" "}
                     <a href="/register" className="text-[#19C37D] hover:underline">
                         Register
                     </a>
-                </div>
-            </div>
+                </p>
+            </form>
         </div>
     );
 }
