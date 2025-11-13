@@ -16,8 +16,8 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:5173",  # local dev
-        "https://chatbot-fullstack-delta.vercel.app",  # your deployed frontend
+        "http://localhost:5173",  # local frontend
+        "https://chatbot-fullstack-delta.vercel.app",  # deployed frontend (Vercel)
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -26,13 +26,19 @@ app.add_middleware(
 
 # ======== MongoDB setup ========
 MONGO_URI = os.getenv("MONGO_URI")
+if not MONGO_URI:
+    raise Exception("❌ MONGO_URI not found in environment variables.")
+
 client = AsyncIOMotorClient(MONGO_URI)
 db = client["chatbot_db"]
 users_collection = db["users"]
 
 # ======== OpenAI setup ========
-client_ai = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    raise Exception("❌ OPENAI_API_KEY not found in environment variables.")
 
+client_ai = OpenAI(api_key=OPENAI_API_KEY)
 
 # ======== MODELS ========
 class RegisterModel(BaseModel):
@@ -65,7 +71,7 @@ async def register(user: RegisterModel):
         "password": hashed_pw.decode("utf-8"),
     }
     await users_collection.insert_one(user_doc)
-    return {"message": "User registered successfully", "username": user.username}
+    return {"message": "✅ User registered successfully", "username": user.username}
 
 
 @app.post("/login")
@@ -80,7 +86,7 @@ async def login(user: LoginModel):
         raise HTTPException(status_code=400, detail="Invalid password")
 
     return {
-        "message": "Login successful",
+        "message": "✅ Login successful",
         "username": db_user["username"],
         "email": db_user["email"],
     }
@@ -96,15 +102,14 @@ async def chat(request: ChatModel):
                 {"role": "user", "content": request.text},
             ],
         )
-
         reply = completion.choices[0].message.content
         return {"reply": reply}
 
     except Exception as e:
-        print("OpenAI API error:", e)
+        print("🚨 OpenAI API error:", e)
         raise HTTPException(status_code=500, detail=f"Chatbot error: {str(e)}")
 
 
 @app.get("/")
 def home():
-    return {"message": "Chatbot backend is running ✅"}
+    return {"message": "🚀 Chatbot backend is running successfully!"}
