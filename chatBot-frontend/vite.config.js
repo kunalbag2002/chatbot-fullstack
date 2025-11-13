@@ -1,10 +1,15 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
-
-// https://vite.dev/config/
+// ✅ Correct config for Vercel deployment
 export default defineConfig({
-  plugins: [react(),
-  ],
-
-})
+  plugins: [react()],
+  build: {
+    outDir: 'dist',
+  },
+  server: {
+    port: 5173,
+  },
+  // ⚠️ The base MUST be "/" for Vercel
+  base: '/',
+});
