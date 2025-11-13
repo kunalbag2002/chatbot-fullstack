@@ -129,7 +129,7 @@ export default function Chat() {
 
         setLoading(true);
         try {
-            const res = await axios.post("http://127.0.0.1:8000/chat", { text });
+            const res = await axios.post("https://chatbot-fullstack-j8hr.onrender.com/chat", { text });
             const reply = res?.data?.reply ?? "Sorry, no reply.";
 
             setChats((prev) =>
