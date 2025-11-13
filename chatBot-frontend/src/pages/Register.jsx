@@ -2,57 +2,47 @@ import { useState } from "react";
 
 export default function Register() {
     const [showPassword, setShowPassword] = useState(false);
-    const [full_name, setFullName] = useState("");
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+
+    async function handleRegister(e) {
+        e.preventDefault();
+
+        try {
+            const res = await fetch("https://chatbot-fullstack-j8hr.onrender.com/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, email, password }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("✅ Account created successfully!");
+                window.location.href = "/login";
+            } else {
+                alert(data.detail || "Registration failed!");
+            }
+        } catch (err) {
+            console.error("Registration error:", err);
+            alert("⚠️ Could not connect to the server.");
+        }
+    }
+
     return (
         <div className="h-screen flex items-center justify-center bg-[#1E1E1E] text-white">
             <div className="w-[380px] bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-8">
                 <h1 className="text-2xl font-semibold mb-6">Create Account</h1>
 
-                <form
-                    className="space-y-4"
-                    onSubmit={async (e) => {
-                        e.preventDefault();
-
-                        const res = await fetch("https://chatbot-fullstack-j8hr.onrender.com/register", {
-                            method: "POST",
-                            headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({
-                                full_name,
-                                username,
-                                email,
-                                password
-                            })
-                        });
-
-                        const data = await res.json();
-
-                        if (data.error) {
-                            alert(data.error);
-                        } else {
-                            alert("✅ Account created successfully!");
-                            window.location.href = "/login";
-                        }
-                    }}
-                >
-                    <div>
-                        <label className="text-sm">Full Name</label>
-                        <input
-                            type="text"
-                            value={full_name}
-                            onChange={(e) => setFullName(e.target.value)}
-                            className="w-full mt-1 p-2 rounded-md bg-[#2A2A2A] border border-zinc-600 outline-none"
-                        />
-                    </div>
-
+                <form onSubmit={handleRegister} className="space-y-4">
                     <div>
                         <label className="text-sm">Username</label>
                         <input
                             type="text"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
+                            required
                             className="w-full mt-1 p-2 rounded-md bg-[#2A2A2A] border border-zinc-600 outline-none"
                         />
                     </div>
@@ -60,9 +50,10 @@ export default function Register() {
                     <div>
                         <label className="text-sm">Email</label>
                         <input
-                            type="text"
+                            type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            required
                             className="w-full mt-1 p-2 rounded-md bg-[#2A2A2A] border border-zinc-600 outline-none"
                         />
                     </div>
@@ -71,10 +62,11 @@ export default function Register() {
                         <label className="text-sm">Password</label>
                         <div className="relative">
                             <input
-                                type="text"
+                                type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full mt-1 p-2 rounded-md bg-[#2A2A2A] border border-zinc-600 outline-none"
+                                required
+                                className="w-full mt-1 p-2 rounded-md bg-[#2A2A2A] border border-zinc-600 outline-none pr-10"
                             />
                             <button
                                 type="button"
@@ -88,7 +80,7 @@ export default function Register() {
 
                     <button
                         type="submit"
-                        className="w-full bg-[#19C37D] text-black font-medium py-2 rounded-md"
+                        className="w-full bg-[#19C37D] text-black font-medium py-2 rounded-md hover:bg-[#16a34a]"
                     >
                         Register
                     </button>
@@ -96,7 +88,7 @@ export default function Register() {
 
                 <div className="mt-4 text-center text-sm">
                     Already have an account?{" "}
-                    <a href="/login" className="text-[#19C37D]">Login</a>
+                    <a href="/login" className="text-[#19C37D] hover:underline">Login</a>
                 </div>
             </div>
         </div>
